@@ -2,43 +2,50 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import datetime
 import pandas
-from pprint import pprint
 import collections
 from dotenv import load_dotenv
 load_dotenv()
 
 excel_file = 'wine.xlsx'
-excel_data_df = pandas.read_excel(excel_file, na_values='None', keep_default_na=False)
 
-categories = excel_data_df['Категория'].tolist
-wines = excel_data_df.to_dict(orient='records')
+def age():
+	creation_year = 1920
+	today_year = datetime.date.today().year
+	age = today_year - creation_year
+	return age
 
+def render_page(assortment):
+	template = env.get_template('template.html')
 
-creation_year = 1920
-today_year = datetime.date.today().year
-age = today_year - creation_year
+	rendered_page = template.render(
+	  age=age(),
+	  assortment=assortment
+	)
 
-env = Environment(
-    loader=FileSystemLoader('.'),
-    autoescape=select_autoescape(['html', 'xml'])
-)
+	with open('index.html', 'w', encoding="utf8") as file:
+	    file.write(rendered_page)
 
-wine_categories = collections.defaultdict(list)
-for wine in wines:
-  wine_categories[wine['Категория']].append(wine)
+def main():
+	excel_data_df = pandas.read_excel(excel_file, na_values='None', keep_default_na=False)
 
-sorted_wine_categories = sorted(wine_categories.items())
+	categories = excel_data_df['Категория'].tolist
+	wines = excel_data_df.to_dict(orient='records')
 
+	env = Environment(
+	    loader=FileSystemLoader('.'),
+	    autoescape=select_autoescape(['html', 'xml'])
+	)
 
-template = env.get_template('template.html')
+	assortment = collections.defaultdict(list)
+	for wine in wines:
+	  assortment[wine['Категория']].append(wine)
 
-rendered_page = template.render(
-  age=age,
-  wine_categories=wine_categories
-)
+	sorted_wine_categories = sorted(assortment.items())
 
-with open('index.html', 'w', encoding="utf8") as file:
-    file.write(rendered_page)
+	render_page(assortment)
+	server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
+	server.serve_forever()
 
-server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
-server.serve_forever()
+if __name__ == '__main__':
+	main()
+
