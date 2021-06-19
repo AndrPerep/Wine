@@ -7,7 +7,8 @@ import collections
 from dotenv import load_dotenv
 load_dotenv()
 
-excel_data_df = pandas.read_excel('wine3.xlsx', na_values='None', keep_default_na=False)
+excel_file = 'wine.xlsx'
+excel_data_df = pandas.read_excel(excel_file, na_values='None', keep_default_na=False)
 
 categories = excel_data_df['Категория'].tolist
 wines = excel_data_df.to_dict(orient='records')
