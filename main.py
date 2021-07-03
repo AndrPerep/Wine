@@ -14,12 +14,12 @@ def age():
 	age = today_year - creation_year
 	return age
 
-def render_page(assortment, env):
+def render_page(sorted_assortment, env):
 	template = env.get_template('template.html')
 
 	rendered_page = template.render(
 	  age=age(),
-	  assortment=assortment
+	  sorted_assortment=sorted_assortment
 	)
 
 	with open('index.html', 'w', encoding="utf8") as file:
@@ -40,9 +40,9 @@ def main():
 	for wine in wines:
 	  assortment[wine['Категория']].append(wine)
 
-	sorted_wine_categories = sorted(assortment.items())
+	sorted_assortment = sorted(assortment.items())
 
-	render_page(assortment, env)
+	render_page(sorted_assortment, env)
 	server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
 	server.serve_forever()
 
