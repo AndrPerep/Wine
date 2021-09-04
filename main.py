@@ -3,10 +3,8 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 import datetime
 import pandas
 import collections
-from dotenv import load_dotenv
-load_dotenv()
 
-excel_file = 'wine.xlsx'
+EXCEL_FILE = 'wine.xlsx'
 
 def age():
 	creation_year = 1920
@@ -26,9 +24,8 @@ def render_page(sorted_assortment, env):
 	    file.write(rendered_page)
 
 def main():
-	excel_data_df = pandas.read_excel(excel_file, na_values='None', keep_default_na=False)
+	excel_data_df = pandas.read_excel(EXCEL_FILE, na_values='None', keep_default_na=False)
 
-	categories = excel_data_df['Категория'].tolist
 	wines = excel_data_df.to_dict(orient='records')
 
 	env = Environment(
